@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crm.system.modules.audit.mapper.AuditLogMapper">
+
+    <!-- 查询待重试的审计日志 -->
+    <select id="selectFailedAuditLogs" resultType="com.crm.system.modules.audit.domain.AuditLog">
+        SELECT *
+        FROM crm_audit_log
+        WHERE report_status = #{reportStatus}
+          AND retry_count &lt; #{maxRetryCount}
+          AND (last_report_time &lt; DATE_SUB(NOW(), INTERVAL 1 HOUR)
+               OR last_report_time IS NULL)
+        ORDER BY create_time ASC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

@@ -1,0 +1,149 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: crm-system
+
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/crm_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: root
+      password: your_password
+      # 连接池配置
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # 监控配置
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+
+  # Redis 配置（可选）
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 0
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+  # JPA 配置（如果使用 JPA）
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    open-in-view: false
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  # Mapper XML 文件位置
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 实体类扫描包路径
+  type-aliases-package: com.crm.system.domain.entity
+  configuration:
+    # 驼峰转下划线
+    map-underscore-to-camel-case: true
+    # 日志输出
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      # 主键类型（雪花算法）
+      id-type: ASSIGN_ID
+      # 逻辑删除字段
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# JWT 配置
+jwt:
+  secret: your-secret-key-change-in-production-environment
+  expiration: 86400000  # 24小时，单位：毫秒
+  header: Authorization
+  prefix: Bearer
+
+# Knife4j API 文档配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+  production: false
+
+# 审计日志配置
+audit:
+  # 是否启用审计功能
+  enabled: true
+  # 上报配置
+  report:
+    # 是否启用上报到外部系统
+    enabled: true
+    # 外部审计系统API地址
+    url: http://localhost:9000/api/audit/logs
+    # API Key认证
+    api-key: your-audit-api-key-here
+    # 连接超时时间（毫秒）
+    connect-timeout: 5000
+    # 读取超时时间（毫秒）
+    read-timeout: 10000
+    # 最大重试次数
+    max-retry-times: 3
+  # 异步处理配置
+  async:
+    # 核心线程数
+    core-pool-size: 5
+    # 最大线程数
+    max-pool-size: 10
+    # 队列容量
+    queue-capacity: 200
+    # 线程空闲时间（秒）
+    keep-alive-seconds: 60
+  # 定时任务配置
+  job:
+    # 是否启用定时重试任务
+    retry-enabled: true
+    # 重试cron表达式（默认每小时执行一次）
+    retry-cron: "0 0 * * * ?"
+  # 数据保留配置
+  retention:
+    # 审计日志保留天数（0表示永久保留）
+    days: 180
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.crm.system: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    com.crm.system.modules.audit: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+  file:
+    name: logs/crm-system.log
+    max-size: 100MB
+    max-history: 30
